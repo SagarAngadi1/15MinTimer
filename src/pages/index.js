@@ -192,37 +192,52 @@ export default function Home({ currentUser }) {
   transition={{ delay: 1, duration: 1 }}
   className="fixed top-6 md:right-10 right-8 z-50"
 >
+
+
+
   <div className="flex items-center gap-8 px-8 py-4 bg-white/5 backdrop-blur-md border border-white/10 rounded-full shadow-md shadow-purple-500/10">
-    <a href="#" className="text-base text-white/80 hover:text-amber-300 transition-all duration-200"onClick={scrollToPricing} >Missions</a>
-    
-    
-    {user ? (
-           <div className="flex space-x-4 items-center me-2 lg:-me-24 ">
-           {/* User Email */}
-           <p className="text-base text-white/80 hover:text-amber-300 transition-all duration-200">
-             {user.email}
-           </p>
-           
-         </div>
+  {/* Missions - Always visible */}
+  <a
+    href="#"
+    onClick={scrollToPricing}
+    className="text-base text-white/80 hover:text-amber-300 transition-all duration-200"
+  >
+    Missions
+  </a>
 
-         
-        ) : (
-          <div className="flex space-x-1 md:space-x-2  lg:-me-24">
+  {user ? null : (
+    <>
+      {/* Show only if user not logged in */}
+      <a
+        href="#missions"
+        onClick={handleSignUpNavigation}
+        className="text-base text-white/80 hover:text-amber-300 transition-all duration-200"
+      >
+        SignUp
+      </a>
 
-<a href="#missions" className="text-base text-white/80 hover:text-amber-300 transition-all duration-200"
-    onClick={handleSignUpNavigation}
-    >SignUp</a>
+      <a
+        href="#about"
+        onClick={handleLogInNavigation}
+        className="text-base text-white/80 hover:text-amber-300 transition-all duration-200"
+      >
+        Login
+      </a>
+    </>
+  )}
 
-    <a href="#about" className="text-base text-white/80 hover:text-amber-300 transition-all duration-200"
-    onClick={handleLogInNavigation}
-    >Login</a>
-          </div>
-        )}
+  {/* Start - Always visible */}
+  <Link
+    href="/PlayGround"
+    className="text-base text-white/80 hover:text-amber-300 transition-all duration-200"
+  >
+    Start
+  </Link>
+</div>
 
-    <Link href="/PlayGround" className="text-base text-white/80 hover:text-amber-300 transition-all duration-200">
-      Start
-    </Link>
-  </div>
+
+
+  
 </motion.nav>
 
 
