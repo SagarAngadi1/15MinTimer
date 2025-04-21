@@ -125,6 +125,16 @@ export default function Home() {
 
 
 
+    
+
+
+
+
+
+
+
+
+
       {/* Hero Section */}
       <section className="relative flex flex-col items-center justify-center text-center px-6 py-0 overflow-hidden">
         {/* Background */}
@@ -133,23 +143,33 @@ export default function Home() {
           <div className="w-full h-full bg-gradient-to-br from-amber-200 via-black to-purple-700 opacity-30 animate-pulse"></div>
         </div>
 
-        {/* Animated Wave with Text Inside */}
+
+
+
+
+
+
+
+
+
+
+
+
+
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 1, duration: 1 }}
-          className="relative w-[900px] h-[900px] flex items-center justify-center"
+          // className="relative w-[900px] h-[900px] flex items-center justify-center"
+          className="relative w-[90vw] sm:w-[500px] md:w-[900px] aspect-square flex items-center justify-center"
         >
-          {/* SVG Wave Animation */}
           <svg
             width="700"
             height="700"
             viewBox="0 0 600 600"
             className="pulse-wave absolute inset-0 w-full h-full"
+            preserveAspectRatio="xMidYMid meet"
           >
-            {/* <path d={paths.wave1} stroke="#00f2ff" className="fill-transparent" />
-            <path d={paths.wave2} stroke="#00bfff" className="fill-transparent" />
-            <path d={paths.wave3} stroke="#0099ff" className="fill-transparent" /> */}
 
             <path d={paths.wave1} stroke="#a9686f" className="fill-transparent" />
             <path d={paths.wave2} stroke="#4e4d8f" className="fill-transparent" />
@@ -159,15 +179,13 @@ export default function Home() {
 
 
 
-          {/* Text Content Inside Wave */}
           <div className="relative z-10 flex flex-col items-center text-center w-[80%] max-w-[600px] px-4 py-6">
-          {/* <div className="relative z-10 flex flex-col items-center text-center w-[65%] max-w-[500px] px-6 py-8 rounded-3xl bg-white/5 backdrop-blur-md border border-white/10 shadow-xl hover:shadow-[0_0_20px_#00f2ff] transition-shadow"> */}
 
             <motion.h1
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 2.4, duration: 1 }}
-              className="text-5xl md:text-6xl font-extrabold"
+              className="text-2xl sm:text-2xl md:text-6xl font-extrabold"
             >
               The 15-Minute Focus Revolution
             </motion.h1>
@@ -176,26 +194,33 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{delay: 2.8, duration: 1 }}
-              className="mt-6 text-xl md:text-2xl max-w-3xl text-gray-300"
+              className="mt-4 sm:mt-6 text-sm md:text-2xl max-w-3xl text-gray-300"
+              // mt-4 sm:mt-6 text-sm sm:text-base md:text-lg lg:text-xl text-gray-300
             >
               Science meets simplicity. Boost your productivity, creativity, and discipline—15 minutes at a time.
             </motion.p>
 
-            {/* Timer */}
-            {/* <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 3.2, duration: 1 }}
-              className="mt-6 text-4xl text-white font-bold"
-            >
-                15:00
-           </motion.div> */}
+
           </div>
 
 
-
-
         </motion.div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
 
         <motion.button
   whileHover={{ scale: 1.1 }}
