@@ -24,3 +24,160 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+
+
+
+
+/* 
+@keyframes wave-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-wave-spin {
+  animation: wave-spin 6s linear infinite;
+} */
+
+
+
+
+
+
+
+
+
+
+
+/* 
+@keyframes wave-spin-slow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes wave-spin-medium {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); } 
+}
+
+@keyframes wave-spin-fast {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(720deg); } 
+}
+
+.animate-wave-spin-slow {
+  animation: wave-spin-slow 12s linear infinite;
+}
+
+.animate-wave-spin-medium {
+  animation: wave-spin-medium 10s linear infinite;
+}
+
+.animate-wave-spin-fast {
+  animation: wave-spin-fast 8s linear infinite;
+} */
+
+
+
+
+/* Keyframes for wave-like motion */
+/* @keyframes wave-motion {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+} */
+
+/* Apply the wave motion to the path elements */
+/* Wave 1 */
+/* .wave-path {
+  animation: wave-motion 10s linear infinite;
+  animation-delay: 0s; 
+} */
+
+/* Wave 2 */
+/* .wave-path:nth-child(2) {
+  animation-delay: 2s; 
+} */
+
+/* Wave 3 */
+/* .wave-path:nth-child(3) {
+  animation-delay: 4s; 
+} */
+
+
+
+
+
+/* @keyframes wave-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+
+
+.pulse-wave {
+  fill: none;
+  stroke-width: 0.5;
+  opacity: 0.8;
+  filter: drop-shadow(0 0 4px #00f2ff);
+  animation: wave-spin 6s linear infinite;
+} */
+
+
+
+
+
+
+@keyframes wave-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.pulse-wave {
+  fill: none;
+  stroke-width: 0.5;
+  opacity: 0.85;
+  animation: wave-spin 6s linear infinite;
+  filter:
+    drop-shadow(0 0 6px #00f2ff)
+    drop-shadow(0 0 12px #00bfff)
+    drop-shadow(0 0 20px #00eaff);
+}
+
+
+
+
+
+
+
+
+
+
+
+/* @keyframes wave-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-wave-spin {
+  animation: wave-spin 6s linear infinite;
+} */
