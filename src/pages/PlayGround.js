@@ -7,8 +7,6 @@ import { parseCookies } from 'nookies';
 
 
 
-
-
 export default function Playground({ currentUser }) {
     const [user, setUser] = useState(currentUser);
     const [showModal, setShowModal] = useState(false);
@@ -82,29 +80,57 @@ const toggleTempTaskDone = (index) => {
     
 
 
+    
+  useEffect(() => {
+    // Re-fetch user client-side if not already set (e.g., after login)
+    if (!currentUser) {
+      const fetchUser = async () => {
+        try {
+          const res = await fetch('/api/fetchCurrentUser', {
+            method: 'GET',
+            //credentials: 'include', // ✅ include cookies
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            setUser(data);
+          }
+        } catch (err) {
+          console.error("Client-side fetch user failed:", err);
+        }
+      };
+
+      fetchUser();
+    }
+  }, [user]);
+
+
 
 
     
 
 
-    useEffect(() => {
-      if (!currentUser) {
-        const fetchUser = async () => {
-          const res = await fetch('/api/fetchCurrentUser', {
-            headers: {
-              'Authorization': `Bearer ${parseCookies().token}`,
-            },
-          });
+    // useEffect(() => {
+    //   if (!currentUser) {
+    //     const fetchUser = async () => {
+    //       const res = await fetch('/api/fetchCurrentUser', {
+    //         headers: {
+    //           'Authorization': `Bearer ${parseCookies().token}`,
+    //         },
+    //       });
   
-          if (res.ok) {
-            const data = await res.json();
-            setUser(data);
-          }
-        };
+    //       if (res.ok) {
+    //         const data = await res.json();
+    //         setUser(data);
+    //       }
+    //     };
   
-        fetchUser();
-      }
-    }, [currentUser]);
+    //     fetchUser();
+    //   }
+    // }, [currentUser]);
 
 
     // useEffect(() => {
@@ -570,6 +596,18 @@ const toggleTempTaskDone = (index) => {
 }
 
 
+// export async function getServerSideProps(context) {
+//   const currentUser = await fetchCurrentUser(context.req);
+
+//   return {
+//     props: {
+//       currentUser: currentUser ? JSON.parse(JSON.stringify(currentUser)) : null,
+//     },
+//   };
+// }
+
+
+// ✅ Get user on server side if possible
 export async function getServerSideProps(context) {
   const currentUser = await fetchCurrentUser(context.req);
 

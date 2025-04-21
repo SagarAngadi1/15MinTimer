@@ -55,7 +55,7 @@
 
 
 import jwt from 'jsonwebtoken';
-import cookie from 'cookie';
+import { parse } from 'cookie';
 import User from '../models/User';
 import connectToDatabase from './mongoose';
 
@@ -70,10 +70,26 @@ const fetchCurrentUser = async (req) => {
     return null;
   }
 
+  // let token = null;
+
+  // try {
+  //   const cookies = cookie.parse(req.headers.cookie || '');
+  //   token = cookies.token;
+  // } catch (err) {
+  //   console.error('Failed to parse cookies:', err);
+  //   return null;
+  // }
+
+
+  // if (!token) {
+  //   return null;
+  // }
+
+  
   let token = null;
 
   try {
-    const cookies = cookie.parse(req.headers.cookie || '');
+    const cookies = parse(req.headers.cookie || ''); // ✅ safely parse
     token = cookies.token;
   } catch (err) {
     console.error('Failed to parse cookies:', err);
