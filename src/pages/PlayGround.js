@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import TimerCard from "../../Components/TimerCard";
+import TimerCard from "../components/TimerCard";
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/router'; // Correct import
 import fetchCurrentUser from '../../utils/fetchCurrentUser';
