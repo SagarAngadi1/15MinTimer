@@ -3,6 +3,7 @@ import TimerCard from "../components/TimerCard";
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/router'; // Correct import
 import fetchCurrentUser from '../../utils/fetchCurrentUser';
+import { parseCookies } from 'nookies';
 
 
 
@@ -304,20 +305,7 @@ const toggleTempTaskDone = (index) => {
 
       {/* Column 2: Main Playground */}
       <main className="w-[50%] min-h-screen p-6">
-        {/* Header */}
-        {/* <div className="flex justify-between items-center mb-6">
-
-          <h1 className="text-2xl font-bold">Sessions</h1>
-          
-
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            onClick={() => setShowModal(true)}
-            className="px-4 py-2 bg-white hover:bg-amber-200 rounded-full text-black text-sm shadow-md"
-          >
-           + New Session
-           </motion.button>
-        </div> */}
+       
 
         {/* Header */}
 <div className="mb-6">
