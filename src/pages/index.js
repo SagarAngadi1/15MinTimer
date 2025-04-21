@@ -195,7 +195,7 @@ export default function Home({ currentUser }) {
 
 
 
-  <div className="flex items-center gap-8 px-8 py-4 bg-white/5 backdrop-blur-md border border-white/10 rounded-full shadow-md shadow-purple-500/10">
+  <div className="  flex items-center gap-8 px-8 py-4 bg-white/20 backdrop-blur-xl border border-white/20 rounded-full shadow-md shadow-purple-500/20">
   {/* Missions - Always visible */}
   <a
     href="#"
