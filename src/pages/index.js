@@ -89,7 +89,7 @@ export default function Home() {
   initial={{ opacity: 0, x: 100 }}
   animate={{ opacity: 1, x: 0 }}
   transition={{ delay: 1, duration: 1 }}
-  className="fixed top-6 md:right-10 right-10 z-50"
+  className="fixed top-6 md:right-10 right-8 z-50"
 >
   <div className="flex items-center gap-8 px-8 py-4 bg-white/5 backdrop-blur-md border border-white/10 rounded-full shadow-md shadow-purple-500/10">
     <a href="#" className="text-base text-white/80 hover:text-amber-300 transition-all duration-200">Missions</a>
