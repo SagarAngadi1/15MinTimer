@@ -87,24 +87,68 @@ const toggleTempTaskDone = (index) => {
     
 
 
+    // useEffect(() => {
+    //   if (!currentUser) {
+    //     const fetchUser = async () => {
+    //       const res = await fetch('/api/fetchCurrentUser', {
+    //         headers: {
+    //           'Authorization': `Bearer ${parseCookies().token}`,
+    //         },
+    //       });
+  
+    //       if (res.ok) {
+    //         const data = await res.json();
+    //         setUser(data);
+    //       }
+    //     };
+  
+    //     fetchUser();
+    //   }
+    // }, [currentUser]);
+
+
     useEffect(() => {
-      if (!currentUser) {
-        const fetchUser = async () => {
-          const res = await fetch('/api/fetchCurrentUser', {
-            headers: {
-              'Authorization': `Bearer ${parseCookies().token}`,
-            },
-          });
+      const fetchUser = async () => {
+        try {
+          const res = await fetch('/api/fetchCurrentUser');
   
           if (res.ok) {
             const data = await res.json();
             setUser(data);
+          } else {
+            console.warn('User not authenticated');
           }
-        };
+        } catch (error) {
+          console.error('Error fetching user:', error);
+        }
+      };
   
+      if (!user) {
         fetchUser();
       }
-    }, [currentUser]);
+    }, [user]);
+
+
+    // useEffect(() => {
+    //   if (!currentUser) {
+    //     const fetchUser = async () => {
+    //       try {
+    //         const res = await fetch('/api/fetchCurrentUser');
+    //         if (res.ok) {
+    //           const data = await res.json();
+    //           setUser(data);
+    //         } else {
+    //           console.warn("No user found");
+    //         }
+    //       } catch (err) {
+    //         console.error("Error fetching user:", err);
+    //       }
+    //     };
+    
+    //     fetchUser();
+    //   }
+    // }, [currentUser]);
+    
 
 
 

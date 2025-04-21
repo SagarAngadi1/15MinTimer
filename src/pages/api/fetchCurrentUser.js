@@ -5,14 +5,34 @@
 //If the user is found, it returns the user data in the response; if not, it returns a 404 status with an error message.
 //This API route is called from client-side code, for example, in the CreateAd.js file, where a fetch request is made to /api/fetchCurrentUser to retrieve the current user's data.
 
+// import fetchCurrentUser from '../../../utils/fetchCurrentUser';
+
+// export default async function handler(req, res) {
+//   const user = await fetchCurrentUser(req);
+  
+//   if (!user) {
+//     return res.status(404).json({ error: 'User not found' });
+//   }
+  
+//   res.status(200).json(user);
+// }
+
+
+
+
 import fetchCurrentUser from '../../../utils/fetchCurrentUser';
 
 export default async function handler(req, res) {
-  const user = await fetchCurrentUser(req);
-  
-  if (!user) {
-    return res.status(404).json({ error: 'User not found' });
+  try {
+    const user = await fetchCurrentUser(req);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    return res.status(200).json(user);
+  } catch (error) {
+    console.error('API Error fetching current user:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
-  
-  res.status(200).json(user);
 }
