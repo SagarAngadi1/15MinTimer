@@ -161,7 +161,7 @@ export default function Home() {
           animate={{ scale: 1 }}
           transition={{ delay: 1, duration: 1 }}
           // className="relative w-[900px] h-[900px] flex items-center justify-center"
-          className="relative w-[90vw] sm:w-[500px] md:w-[900px] aspect-square flex items-center justify-center"
+          className="relative w-[90vw] sm:w-[500px] md:w-[900px] aspect-square flex items-center justify-center mt-6 sm:mt-6 md:mt-0"
         >
           <svg
             width="700"
@@ -213,14 +213,6 @@ export default function Home() {
 
 
 
-
-
-
-
-
-
-
-        
 
         <motion.button
   whileHover={{ scale: 1.1 }}
