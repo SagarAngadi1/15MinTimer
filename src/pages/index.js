@@ -5,9 +5,11 @@ import Link from "next/link";
 import { useRouter } from 'next/router';
 
 
-export default function Home() {
+export default function Home({ currentUser }) {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const router = useRouter();
+  const [user, setUser] = useState(currentUser);
+  
 
 
   const pricingSectionRef = useRef(null);
@@ -26,6 +28,27 @@ export default function Home() {
       router.replace(pathname, undefined, { shallow: true });
     }
   }, [router.query]);
+
+
+    
+  useEffect(() => {
+    if (!currentUser) {
+      const fetchUser = async () => {
+        try {
+          const res = await fetch('/api/fetchCurrentUser');
+          if (res.ok) {
+            const data = await res.json();
+            setUser(data);
+          }
+        } catch (err) {
+          console.error("Client-side fetch user failed:", err);
+        }
+      };
+  
+      fetchUser();
+    }
+  }, [currentUser]); // ✅ This avoids infinite re-renders
+  
 
 
 
@@ -144,13 +167,28 @@ export default function Home() {
     <a href="#" className="text-base text-white/80 hover:text-amber-300 transition-all duration-200"onClick={scrollToPricing} >Missions</a>
     
     
-    <a href="#missions" className="text-base text-white/80 hover:text-amber-300 transition-all duration-200"
+    {user ? (
+           <div className="flex space-x-4 items-center me-2 lg:-me-24 ">
+           {/* User Email */}
+           <p className="text-base text-white/80 hover:text-amber-300 transition-all duration-200">
+             {user.email}
+           </p>
+           
+         </div>
+
+         
+        ) : (
+          <div className="flex space-x-1 md:space-x-2  lg:-me-24">
+
+<a href="#missions" className="text-base text-white/80 hover:text-amber-300 transition-all duration-200"
     onClick={handleSignUpNavigation}
     >SignUp</a>
 
     <a href="#about" className="text-base text-white/80 hover:text-amber-300 transition-all duration-200"
     onClick={handleLogInNavigation}
     >Login</a>
+          </div>
+        )}
 
     <Link href="/PlayGround" className="text-base text-white/80 hover:text-amber-300 transition-all duration-200">
       Start
@@ -158,6 +196,12 @@ export default function Home() {
   </div>
 </motion.nav>
 
+
+
+
+
+
+      
 
 
       {/* Cursor Glow */}
@@ -396,8 +440,37 @@ export default function Home() {
 
 </section>
 
+<footer className="w-full mt-24 px-6 md:px-20 py-12 border-t border-white/10 bg-black text-white/70">
+  <div className="max-w-7xl mx-auto flex flex-col items-center text-center space-y-4">
+    {/* Connect / Email */}
+    <div>
+      <h4 className="text-lg font-semibold text-white mb-2">Connect</h4>
+      <p className="text-sm text-gray-400">
+        Email: <a href="mailto:ianassagar@gmail.com" className="hover:text-amber-300">ianassagar@gmail.com</a>
+      </p>
+    </div>
+
+    {/* Bottom */}
+    <div className="border-t border-white/10 pt-6 text-xs text-gray-500 w-full text-center">
+      © {new Date().getFullYear()} 15-Min Timer. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+
+
     </div>
   );
+}
+
+export async function getServerSideProps(context) {
+  const currentUser = await fetchCurrentUser(context.req);
+
+  return {
+    props: {
+      currentUser: currentUser ? JSON.parse(JSON.stringify(currentUser)) : null,
+    },
+  };
 }
 
 

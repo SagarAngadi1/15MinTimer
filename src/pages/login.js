@@ -227,8 +227,11 @@ const Login = () => {
         </div>
       )}
 
+
+
+
       {resetSuccess && (
-        <div className="w-full p-2 md:w-1/3 flex flex-col">
+        <div className="w-full p-2  flex flex-col">
           <input
             type="password"
             placeholder="Enter new password"
