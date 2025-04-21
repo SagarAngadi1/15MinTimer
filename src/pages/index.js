@@ -33,11 +33,38 @@ export default function Home({ currentUser }) {
 
 
     
+  // useEffect(() => {
+  //   if (!currentUser) {
+  //     const fetchUser = async () => {
+  //       try {
+  //         const res = await fetch('/api/fetchCurrentUser');
+  //         if (res.ok) {
+  //           const data = await res.json();
+  //           setUser(data);
+  //         }
+  //       } catch (err) {
+  //         console.error("Client-side fetch user failed:", err);
+  //       }
+  //     };
+  
+  //     fetchUser();
+  //   }
+  // }, [currentUser]); // ✅ This avoids infinite re-renders
+
+
+    
   useEffect(() => {
     if (!currentUser) {
       const fetchUser = async () => {
         try {
-          const res = await fetch('/api/fetchCurrentUser');
+          const res = await fetch('/api/fetchCurrentUser', {
+            method: 'GET',
+            //credentials: 'include', // ✅ include cookies
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
           if (res.ok) {
             const data = await res.json();
             setUser(data);
