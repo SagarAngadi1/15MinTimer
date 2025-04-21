@@ -194,10 +194,11 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{delay: 2.8, duration: 1 }}
-              className="mt-4 sm:mt-6 text-sm md:text-2xl max-w-3xl text-gray-300"
+              className="mt-8 sm:mt-8 text-sm md:text-2xl max-w-3xl text-gray-300"
               // mt-4 sm:mt-6 text-sm sm:text-base md:text-lg lg:text-xl text-gray-300
             >
-              Science meets simplicity. Boost your productivity, creativity, and discipline—15 minutes at a time.
+              Create time-bound sessions, add checklists, track your activities, and turn shallow hours into focused deep work.
+              {/* Science meets simplicity. Boost your productivity, creativity, and discipline—15 minutes at a time. */}
             </motion.p>
 
 
