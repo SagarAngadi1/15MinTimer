@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Head from "next/head";
 import Link from "next/link";
@@ -10,12 +10,61 @@ export default function Home() {
   const router = useRouter();
 
 
+  const pricingSectionRef = useRef(null);
+
+  const scrollToPricing = () => {
+    if (pricingSectionRef.current) {
+      pricingSectionRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  useEffect(() => {
+    if (router.query.scrollToPricing === 'true' && pricingSectionRef.current) {
+      pricingSectionRef.current.scrollIntoView({ behavior: 'smooth' });
+
+      const { pathname } = router;
+      router.replace(pathname, undefined, { shallow: true });
+    }
+  }, [router.query]);
+
+
+
   const handleSignUpNavigation = () => {
     router.push('/signup');
   };
 
   const handleLogInNavigation = () => {
     router.push('/login');
+  };
+
+  const handlePlayGroundNavigation = () => {
+    router.push('/PlayGround');
+  };
+
+  const handleWorkSpaceNavigation = (card) => {
+    // router.push('/signup');
+    router.push({
+      pathname: '/workspace',
+      query: {
+        title: card.title,
+        //note: note,
+        time: convertToSeconds(card.time), // convert if needed
+        tasks: JSON.stringify(card.tasks),
+      }
+    });
+
+    console.log("Navigating to workspace with:", card);
+
+  };
+
+
+  const convertToSeconds = (timeString) => {
+    if (typeof timeString === 'number') return timeString; // already in seconds
+    if (typeof timeString === 'string' && timeString.includes(':')) {
+      const [minutes, seconds] = timeString.split(':').map(Number);
+      return (minutes * 60 + (seconds || 0)).toString();
+    }
+    return timeString; // fallback
   };
 
   useEffect(() => {
@@ -92,7 +141,8 @@ export default function Home() {
   className="fixed top-6 md:right-10 right-8 z-50"
 >
   <div className="flex items-center gap-8 px-8 py-4 bg-white/5 backdrop-blur-md border border-white/10 rounded-full shadow-md shadow-purple-500/10">
-    <a href="#" className="text-base text-white/80 hover:text-amber-300 transition-all duration-200">Missions</a>
+    <a href="#" className="text-base text-white/80 hover:text-amber-300 transition-all duration-200"onClick={scrollToPricing} >Missions</a>
+    
     
     <a href="#missions" className="text-base text-white/80 hover:text-amber-300 transition-all duration-200"
     onClick={handleSignUpNavigation}
@@ -216,21 +266,24 @@ export default function Home() {
 
 
         <motion.button
-  whileHover={{ scale: 1.1 }}
-  className="mt-10 mb-2 px-8 py-4 rounded-full bg-white/5 border border-white/10 backdrop-blur-md text-white/80 hover:text-amber-300 transition-all duration-200 shadow-md shadow-purple-500/10 z-10 font-bold"
->
-  Get Started
-</motion.button>
+          whileHover={{ scale: 1.1 }}
+          className="mt-10 mb-2 px-8 py-4 rounded-full bg-white/5 border border-white/10 backdrop-blur-md text-white/80 hover:text-amber-300 transition-all duration-200 shadow-md shadow-purple-500/10 z-10 font-bold"
+          onClick={handlePlayGroundNavigation}   
+        >
+         Get Started
+        </motion.button>
 
       </section>
 
+     
 
 
 
 
 
 
-  <section className="relative z-10 px-6 md:px-20 py-24 bg-black text-white">
+
+  <section ref={pricingSectionRef} className="relative z-10 px-6 md:px-20 py-24 bg-black text-white">
   <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 text-white/90">
     Pick Your <span className="text-amber-200">15-Min Missions</span>
   </h2>
@@ -256,10 +309,10 @@ export default function Home() {
         tasks: ["Read 10 pages", "Summarize key points"],
       },
       {
-        title: "Creative Writing",
+        title: "Painting",
         img: "/Painting.png",
         objectPosition: "object-[50%_50%]",
-        tasks: ["Write 1 paragraph", "Edit last draft"],
+        tasks: ["Try new style", "Complete first draft"],
       },
       {
         title: "Inbox Zero",
@@ -280,6 +333,7 @@ export default function Home() {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ delay: idx * 0.1 }}
         className="relative rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md p-5 overflow-hidden shadow-lg hover:shadow-amber-300 transition-all duration-300"
+        onClick={() => handleWorkSpaceNavigation(card)}
       >
         <div className="me-3 mt-1 absolute top-5 right-3 bg-black/50 text-amber-300 text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
           15:00
@@ -298,14 +352,40 @@ export default function Home() {
 
 
 
-        <ul className="text-sm text-gray-300 space-y-2">
+        {/* <ul className="text-sm text-gray-300 space-y-2">
           {card.tasks.map((task, i) => (
             <li key={i} className="flex items-start gap-2">
-              <input type="checkbox" className="accent-cyan-400 mt-1" />
+              <input type="checkbox" className="bg-amber-200 mt-1" />
               <span>{task}</span>
             </li>
           ))}
-        </ul>
+        </ul> */}
+
+  <ul className="text-sm text-gray-300 space-y-2">
+  {card.tasks.map((task, i) => (
+    <li key={i} className="flex items-start gap-3">
+      <label className="flex items-center gap-2 cursor-pointer group">
+        <input
+          type="checkbox"
+          className="peer hidden"
+        />
+        <div className="w-4 h-4 rounded-md border border-gray-400 peer-checked:bg-amber-200 flex items-center justify-center transition">
+          {/* Checkmark (✓) inside the box */}
+          <svg
+            className="w-2 h-2 text-black opacity-0 peer-checked:opacity-100 transition"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <span className="select-none">{task}</span>
+      </label>
+    </li>
+  ))}
+</ul>
 
       </motion.div>
     ))}
