@@ -397,13 +397,13 @@ const toggleTempTaskDone = (index) => {
           },
         ].map((card, idx) => {
           const image = sessionImages[idx % sessionImages.length];
-         // 🧠 Properly format time if it's in seconds
+         // 🧠 Properly format time if it's in seconds 
           const displayTime =
           typeof card.time === "number"
           ? formatTime(card.time)
-          : card.time.includes(":")
+          : typeof card.time === "string" && card.time.includes(":")
           ? card.time
-          : formatTime(Number(card.time));          
+          : formatTime(Number(card.time) || 0);
           
           return (
             <TimerCard
