@@ -4,6 +4,8 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from 'next/router';
 import fetchCurrentUser from '../../utils/fetchCurrentUser';
+import axios from 'axios'; // Add this line if missing
+
 
 
 
@@ -11,6 +13,7 @@ export default function Home({ currentUser }) {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const router = useRouter();
   const [user, setUser] = useState(currentUser);
+  const [time, setTime] = useState("900");
   
 
 
@@ -68,6 +71,8 @@ export default function Home({ currentUser }) {
           if (res.ok) {
             const data = await res.json();
             setUser(data);
+          }else {
+            console.warn('User session expired. Redirecting to login...');
           }
         } catch (err) {
           console.error("Client-side fetch user failed:", err);
@@ -91,17 +96,23 @@ export default function Home({ currentUser }) {
 
   const handlePlayGroundNavigation = () => {
     router.push('/PlayGround');
+    //router.push('/test');
+
   };
 
   const handleWorkSpaceNavigation = (card) => {
+      const createdDate = card.createdDate ? new Date(card.createdDate) : new Date(); // fallback to now
+
     // router.push('/signup');
     router.push({
       pathname: '/workspace',
       query: {
         title: card.title,
         //note: note,
-        time: convertToSeconds(card.time), // convert if needed
+        time: convertToSeconds(time), // convert if needed
         tasks: JSON.stringify(card.tasks),
+        createdAt: createdDate.toISOString(),
+
       }
     });
 
@@ -170,6 +181,90 @@ export default function Home({ currentUser }) {
 
     animate();
   }, []);
+
+
+   // Load the Razorpay checkout script dynamically when the component mounts
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
+
+
+
+  // Function to start checkout process for a specific product
+  const handlePayment = async () => {
+
+  
+    if (!user) {
+      // Redirect to signup if the user is not logged in
+      router.push('/signup');
+      return;
+    }
+
+    try {
+      const userId = user._id
+      const response = await axios.post('/api/payments', { userId });
+      const { orderId, key, credits } = response.data;
+      //const { subscriptionId, key, credits } = response.data;
+
+      
+      // Load the Razorpay checkout script
+      const options = {
+        key, // Razorpay Key
+        amount: response.data.amount,
+        currency: 'USD',
+        name: 'DressUp AI - Payment',
+        description: 'Choose your plan',
+        //subscription_id: subscriptionId,
+        order_id: orderId,
+
+       // Credits: response.data.Credits, //added now
+
+        handler: async function (response) {
+          // Handle the successful payment response here
+          alert('Payment Success: ' + response.razorpay_payment_id);
+
+          // Call the updateUserCredits API to update the credits after successful payment
+          try {
+            await axios.post('/api/updatePlan', { userId });
+
+          //   await axios.post('/api/updateUserCredits', {
+          //    userId,
+          //    credits, // The credits for the selected plan
+          //  });
+          
+           // Redirect to CreateProductPhoto page after updating credits
+           router.push('/PlayGround');
+
+          } catch (updateError) {
+            console.error('Error updating credits:', updateError);
+            alert('Error updating credits. Please contact support.');
+          }
+
+        
+          //router.push('/CreateProductPhoto'); // Redirect to success page
+
+        },
+        prefill: {
+          email: user.email, // You can fill these from the user's data
+          //email: 'john.doe@example.com',
+          //contact: '9999999999'
+        },
+        theme: {
+          color: '#3399cc'
+        }
+      };
+
+    const razorpay = new window.Razorpay(options);
+    razorpay.open();
+
+    } catch (error) {
+      console.error('Payment Error:', error);
+      alert('Failed to start payment process.');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-black text-white font-sans">
@@ -280,16 +375,6 @@ export default function Home({ currentUser }) {
         <div className="absolute inset-0 z-0 pointer-events-none">
           <div className="w-full h-full bg-gradient-to-br from-amber-200 via-black to-purple-700 opacity-30 animate-pulse"></div>
         </div>
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -484,6 +569,58 @@ export default function Home({ currentUser }) {
 
 </section>
 
+
+
+
+
+
+
+{/* Pricing Section */}
+<section ref={pricingSectionRef} className="relative z-10 py-32 px-6 bg-black text-white" id="pricing">
+  <div className="max-w-5xl mx-auto text-center">
+    <h2 className="text-4xl font-extrabold mb-6 text-amber-300">Choose Your Mission Plan</h2>
+    <p className="text-lg text-white/80 mb-16">
+      Whether you're just getting started or going all in, we’ve got you covered.
+    </p>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+      {/* Free Plan */}
+      <div className="bg-white/10 border border-white/20 backdrop-blur-lg p-8 rounded-2xl shadow-lg shadow-purple-500/10 hover:shadow-amber-300 transition-all">
+        <h3 className="text-2xl font-bold text-white mb-4">Free Plan</h3>
+        <p className="text-white/70 mb-6">4 sessions per day</p>
+        <p className="text-3xl font-semibold text-white mb-6">$0<span className="text-base text-white/60">/mo</span></p>
+        <button
+          onClick={handlePlayGroundNavigation}
+          whileHover={{ scale: 1.1 }}
+          className="mt-4 mb-2 px-8 py-4 rounded-full bg-white/5 border border-white/10 backdrop-blur-md text-white/80 hover:text-amber-300 transition-all duration-200 shadow-md shadow-purple-500/10 z-10 font-bold"
+         
+         // className="mt-4 px-6 py-3 rounded-full bg-purple-600 hover:bg-purple-700 text-white font-semibold transition-all"
+        >
+          Start for Free
+        </button>
+      </div>
+
+      {/* Pro Plan */}
+      <div className="bg-gradient-to-br from-purple-600 via-amber-400 to-pink-500 text-white p-8 rounded-2xl shadow-xl transform hover:scale-105 transition-all">
+        <h3 className="text-2xl font-bold text-black mb-4">Pro Plan</h3>
+        <p className="text-black/70 font-bold mb-6">Unlimited sessions daily</p>
+        <p className="text-3xl font-bold text-black mb-6">$9.90<span className="text-base text-black/60">/mo</span></p>
+        <button
+          //onClick={() => alert("Integrate Razorpay/Stripe Checkout")}
+          //onClick={() => handlePayment('pro')}
+          onClick={handlePayment}
+
+
+          className="mt-4 px-8 py-4 rounded-full bg-black hover:bg-gray-900 text-white font-semibold transition-all"
+        >
+          Upgrade to Pro
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+
 <footer className="w-full mt-24 px-6 md:px-20 py-12 border-t border-white/10 bg-black text-white/70">
   <div className="max-w-7xl mx-auto flex flex-col items-center text-center space-y-4">
     {/* Connect / Email */}
@@ -516,204 +653,5 @@ export async function getServerSideProps(context) {
     },
   };
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import React from "react";
-// import { motion } from "framer-motion";
-// import Head from "next/head";
-// import { useEffect, useRef, useState } from "react";
-
-// export default function Home() {
-//   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-
-//   useEffect(() => {
-//     const updateMousePosition = (e) => {
-//       setMousePosition({ x: e.clientX, y: e.clientY });
-//     };
-
-//     window.addEventListener("mousemove", updateMousePosition);
-//     return () => {
-//       window.removeEventListener("mousemove", updateMousePosition);
-//     };
-//   }, []);
-
-//   function generateWavyCirclePath(radius, amplitude, frequency, phase = 0) {
-//     const points = [];
-//     const resolution = 200; // Higher = smoother
-//     for (let i = 0; i <= resolution; i++) {
-//       const angle = (i / resolution) * 2 * Math.PI;
-//       const wave = amplitude * Math.sin(angle * frequency + phase);
-//       const r = radius + wave;
-//       const x = 150 + r * Math.cos(angle); // Centered at (150, 150)
-//       const y = 150 + r * Math.sin(angle);
-//       points.push(`${i === 0 ? "M" : "L"} ${x} ${y}`);
-//     }
-//     return points.join(" ") + " Z";
-//   }
-
-//   const [paths, setPaths] = useState({
-//     wave1: "",
-//     wave2: "",
-//     wave3: "",
-//   });
-
-//   const phase = useRef(0);
-
-//   useEffect(() => {
-//     const animate = () => {
-//       phase.current += 0.03;
-
-//       setPaths({
-//         wave1: generateWavyCirclePath(100, 10, 6, phase.current),
-//         wave2: generateWavyCirclePath(90, 8, 5.5, phase.current + 1),
-//         wave3: generateWavyCirclePath(110, 12, 7, phase.current + 2),
-//       });
-
-//       requestAnimationFrame(animate);
-//     };
-
-//     animate();
-//   }, []);
-
-//   return (
-//     <div className="min-h-screen bg-black text-white font-sans">
-//       <Head>
-//         <title>Pulse of Energy</title>
-//         <meta
-//           name="description"
-//           content="Experience the pulse of energy with intertwined waves."
-//         />
-//       </Head>
-
-//       {/* Cursor glow */}
-//       <div
-//         className="pointer-events-none fixed z-50 rounded-full blur-3xl mix-blend-screen"
-//         style={{
-//           top: mousePosition.y - 150,
-//           left: mousePosition.x - 150,
-//           width: 300,
-//           height: 300,
-//           background:
-//             "radial-gradient(circle, rgba(168,85,247,0.6), rgba(168,85,247,0.1), transparent 80%)",
-//         }}
-//       />
-
-//       {/* Hero Section */}
-//       <section className="relative flex flex-col items-center justify-center text-center px-6 py-32 overflow-hidden">
-//         <div className="absolute inset-0 z-0 pointer-events-none">
-//           <div className="w-full h-full bg-gradient-to-br from-purple-900 via-black to-gray-900 opacity-30 animate-pulse"></div>
-//         </div>
-
-//         <motion.h1
-//           initial={{ opacity: 0, y: 40 }}
-//           animate={{ opacity: 1, y: 0 }}
-//           transition={{ duration: 1 }}
-//           className="text-5xl md:text-6xl font-extrabold z-10"
-//         >
-//           The Pulse of Energy
-//         </motion.h1>
-
-//         <motion.p
-//           initial={{ opacity: 0, y: 20 }}
-//           animate={{ opacity: 1, y: 0 }}
-//           transition={{ delay: 0.4, duration: 1 }}
-//           className="mt-6 text-xl md:text-2xl max-w-3xl text-gray-300 z-10"
-//         >
-//           Intertwining waves that pulse with energy—Feel the rhythm.
-//         </motion.p>
-
-//         <motion.div
-//           initial={{ scale: 0 }}
-//           animate={{ scale: 1 }}
-//           transition={{ delay: 1.2, duration: 1 }}
-//           className="relative w-64 h-64 mt-8 flex items-center justify-center"
-//         >
-//           <svg
-//             viewBox="0 0 300 300"
-//             className="absolute top-0 left-0 w-full h-full"
-//             xmlns="http://www.w3.org/2000/svg"
-//           >
-//             <path
-//               d={paths.wave1}
-//               fill="none"
-//               stroke="#a855f7" // purple-500
-//               strokeWidth="2"
-//               className="wave-path"
-//             />
-//             <path
-//               d={paths.wave2}
-//               fill="none"
-//               stroke="#22d3ee" // cyan-400
-//               strokeWidth="1.5"
-//               className="wave-path"
-//             />
-//             <path
-//               d={paths.wave3}
-//               fill="none"
-//               stroke="#f472b6" // pink-400
-//               strokeWidth="1.5"
-//               className="wave-path"
-//             />
-//           </svg>
-
-//           {/* Timer Text */}
-//           <div className="text-4xl text-white font-bold z-10">15:00</div>
-//         </motion.div>
-//       </section>
-//     </div>
-//   );
-// }
 
 

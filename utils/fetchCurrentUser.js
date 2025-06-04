@@ -6,15 +6,10 @@
 // import connectToDatabase from './mongoose';
 // //import dbConnect from '../utils/dbConnect';
 
-// const JWT_SECRET = process.env.JWT_SECRET || 'Timer$$$project1setcretyeK795$$$';
+// const JWT_SECRET = process.env.JWT_SECRET || 'DressUp$$$project1setcretyeK795$$$';
 
 // const fetchCurrentUser = async (req) => {
 //   await connectToDatabase();
-
-//   if (!req || !req.headers || !req.headers.cookie) {
-//     console.warn('Missing request headers or cookies');
-//     return null;
-//   }
 
 //   //const token = req.cookies.token;
 //   const cookies = cookie.parse(req.headers.cookie || '');
@@ -34,19 +29,11 @@
 
 //     return user;
 //   } catch (error) {
-//     console.error('Error verifying token:', error);
 //     return null;
 //   }
 // };
 
 // export default fetchCurrentUser;
-
-
-
-
-
-
-
 
 
 
@@ -105,10 +92,31 @@ const fetchCurrentUser = async (req) => {
     const user = await User.findById(decoded.userId).lean(); // Optional `.lean()` for perf
 
     return user || null;
-  } catch (error) {
-    console.error('Error verifying token or fetching user:', error);
+  }
+  //  catch (error) {
+  //   console.error('Error verifying token or fetching user:', error);
+  //   return null;
+  // }
+  catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      console.warn('Token expired at:', error.expiredAt);
+    } else {
+      console.error('Error verifying token or fetching user:', error);
+    }
     return null;
   }
 };
 
 export default fetchCurrentUser;
+
+
+
+
+
+
+
+
+
+
+
+

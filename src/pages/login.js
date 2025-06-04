@@ -87,9 +87,6 @@ const Login = () => {
       }
 
     }
-
-
-
    
   };
 
@@ -249,7 +246,7 @@ const Login = () => {
       )}
 
       <h1 className="text-md font-bold mt-8" style={{ lineHeight: '1' }}>
-        New to Ad-Suite? Just 
+        New to Space? Just 
         <Link className="text-amber-200 hover:text-amber-300" href="/signup"> SignUp!</Link>
       </h1>
 

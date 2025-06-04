@@ -37,7 +37,10 @@ export default async function handler(req, res) {   // API route handler functio
     const user = await new User({ // Creates a new instance of the User model with the provided email and hashed password.
       email,
       password: hashedPassword,
-      credits: 150
+      // credits: 150
+      CurrentPlan: 'basic',
+      dailySessionCount: 0,
+      lastSessionDate: new Date(), // initialize it now
     });
 
 

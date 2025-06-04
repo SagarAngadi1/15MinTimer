@@ -64,31 +64,61 @@ const handler = async (req, res) =>{
 
 
 
-      //const { title, note, time } = fields;
-      const tasks = [];
+      // const tasks = [];
+      // for (const key in fields) {
+      //   if (key.startsWith("tasks[")) {
+      //     const value = fields[key];
+      //     if (Array.isArray(value)) {
+      //       tasks.push(...value.map(String)); // Flatten inner array and cast to string
+      //     } else {
+      //       tasks.push(String(value));
+      //     }
+      //   }
+      // }
 
-      for (const key in fields) {
-        if (key.startsWith("tasks[")) {
-          const value = fields[key];
-          if (Array.isArray(value)) {
-            tasks.push(...value.map(String)); // Flatten inner array and cast to string
-          } else {
-            tasks.push(String(value));
-          }
-        }
-      }
+
+
+
+
+      // const tasks = [];
+
+      // for (const key in fields) {
+      //      if (key.startsWith("tasks[")) {
+      //     const value = fields[key];
+      //     if (Array.isArray(value)) {
+      //     tasks.push(...value.map(val => ({ text: String(val), done: false })));
+      //      } else {
+      //     tasks.push({ text: String(value), done: false });
+      //   }
+      //  }
+      // }
+
+
+      let rawTasks = fields.tasks || [];
+if (!Array.isArray(rawTasks)) rawTasks = [rawTasks];
+
+const tasks = rawTasks.map(task => ({
+  text: String(task),
+  done: false,
+}));
+
+
       
 
 
+      const createdDate = new Date().toISOString();
 
       const newSession = new Session({
         //identity: userId,
         title: sessionTitle,
         note: sessionNote,
         //time: Number(time),
-        time: sessionTime,
+        time: Number(sessionTime),
+        //time: sessionTime,
         tasks,
         userId: userId,
+        createdDate: createdDate,
+
       });
 
       await newSession.save();
@@ -96,8 +126,11 @@ const handler = async (req, res) =>{
       //return res.status(201).json(newSession);
 
       return res.status(201).json({
+
         success: true,
         data: newSession, 
+        createdDate: createdDate,
+
      }); 
     } catch (error) {
       console.error("Error creating session:", error);

@@ -1,19 +1,83 @@
 import { useRouter } from 'next/router';
 import { CountdownCircleTimer } from 'react-countdown-circle-timer';
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 export default function WorkSpace() {
   const router = useRouter();
-  //const { title, note, time, tasks } = router.query;
 
-  const { title, note, time, tasks: rawTasks } = router.query;
+  const { createdAt, sessionId, title, note, time, tasks: rawTasks } = router.query;
+
+ 
+
   const tasks = JSON.parse(rawTasks || "[]");
-
-
   const parsedTime = parseInt(time || "900"); // default 15 mins
+
+   const [session, setSession] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(null);
   const [key, setKey] = useState(0); // reset timer logic
   const [isPlaying, setIsPlaying] = useState(true);
+
+  const [initialTime, setInitialTime] = useState(null);
+
+
+   const latestRemainingTimeRef = useRef(null);
+
+  console.log("✅ CreatedAt Time:", createdAt);
+  console.log("✅ sessionId:", sessionId);
+
+
+
+
+
+ // ⚡ Try to load persisted state
+   useEffect(() => {
+    const stored = localStorage.getItem(`session-${sessionId}`);
+    if (stored) {
+      const { timeLeft: savedTime, isPlaying: savedPlaying } = JSON.parse(stored);
+      setTimeLeft(savedTime);
+      setInitialTime(savedTime);
+      setIsPlaying(savedPlaying);
+      latestRemainingTimeRef.current = savedTime;
+      console.log('⏳ Loaded from localStorage:', savedTime, savedPlaying);
+      return;
+    }
+
+    // Initial calculation based on createdAt if no saved state
+    if (!createdAt || !time) return;
+
+    const createdDate = new Date(createdAt);
+    const now = new Date();
+    const elapsed = Math.floor((now - createdDate) / 1000);
+    const remaining = Math.max(parseInt(time) - elapsed, 0);
+
+    setTimeLeft(remaining);
+    setInitialTime(remaining);
+    latestRemainingTimeRef.current = remaining;
+  }, [createdAt, time, sessionId]);
+
+
+
+
+
+
+  // 💾 Save on unload
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (latestRemainingTimeRef.current !== null && sessionId) {
+        localStorage.setItem(`session-${sessionId}`, JSON.stringify({
+          timeLeft: latestRemainingTimeRef.current,
+          isPlaying
+        }));
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isPlaying, sessionId]);
+
+
+
+
 
 
 
@@ -27,24 +91,42 @@ const [noteText, setNoteText] = useState(note || "");
 //const [editableTasks, setEditableTasks] = useState(initialTasks);
 
 
+
+
+
 // Sync note from query on reload
 useEffect(() => {
   setNoteText(note || "");
 }, [note]);
 
  // Editable Tasks State
- const [editableTasks, setEditableTasks] = useState(() => {
-    try {
-      const parsed = JSON.parse(rawTasks || "[]");
-      return Array.isArray(parsed)
-        ? parsed.map(t => ({ text: t, done: false }))
-        : typeof parsed === "string"
-        ? [{ text: parsed, done: false }]
-        : [];
-    } catch {
-      return [];
-    }
-  });
+//  const [editableTasks, setEditableTasks] = useState(() => {
+//     try {
+//       const parsed = JSON.parse(rawTasks || "[]");
+//       return Array.isArray(parsed)
+//         ? parsed.map(t => ({ text: t, done: false }))
+//         : typeof parsed === "string"
+//         ? [{ text: parsed, done: false }]
+//         : [];
+//     } catch {
+//       return [];
+//     }
+//   });
+
+
+  const [editableTasks, setEditableTasks] = useState(() => {
+  try {
+    const parsed = JSON.parse(rawTasks || "[]");
+    return Array.isArray(parsed)
+      ? parsed.map(t => ({ text: t, done: false, saved: true }))
+      : typeof parsed === "string"
+      ? [{ text: parsed, done: false, saved: true }]
+      : [];
+  } catch {
+    return [];
+  }
+});
+
 
 
 
@@ -65,21 +147,134 @@ useEffect(() => {
 
 
 
+
+
+
   const updateTaskText = (index, newText) => {
     const updated = [...editableTasks];
     updated[index].text = newText;
     setEditableTasks(updated);
   };
 
-  const toggleTaskDone = (index) => {
-    const updated = [...editableTasks];
-    updated[index].done = !updated[index].done;
-    setEditableTasks(updated);
-  };
 
-  const addTask = () => {
-    setEditableTasks([...editableTasks, { text: "", done: false }]);
-  };
+
+  const toggleTaskDone = async (index) => {
+  const updated = [...editableTasks];
+  updated[index].done = !updated[index].done;
+  setEditableTasks(updated);
+
+  // Sync the updated task with backend
+  const taskToUpdate = updated[index];
+
+  if (sessionId) {
+    await updateTaskDoneStatus(sessionId, taskToUpdate.text, taskToUpdate.done);
+
+    //await persistTaskToBackend(sessionId, taskToUpdate);
+  }
+};
+
+
+
+//   const addTask = async () => {
+//   const newTask = { text: "", done: false };
+//   setEditableTasks(prev => [...prev, newTask]);
+
+//   // Immediately persist empty task (or you can wait for user to type, optional)
+//   if (sessionId) {
+//     const saved = await persistTaskToBackend(sessionId, newTask);
+//     if (saved) {
+//       console.log("✅ Task saved to DB.");
+//     }
+//   }
+// };
+
+
+const addTask = () => {
+  const newTask = { text: "", done: false, saved: false };
+  setEditableTasks(prev => [...prev, newTask]);
+};
+
+
+
+const saveTask = async (index) => {
+  const task = editableTasks[index];
+  if (!task.text.trim()) return;
+
+  const updatedSession = await persistTaskToBackend(sessionId, task);
+
+  if (updatedSession) {
+    const updated = [...editableTasks];
+    updated[index].saved = true;
+    setEditableTasks(updated);
+  }
+};
+
+
+
+
+
+
+  async function persistTaskToBackend(sessionId, task) {
+  try {
+    const response = await fetch("/api/updateTask", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sessionId,
+        newTask: {
+          text: task.text,
+          done: task.done,
+        },
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || "Failed to persist task");
+    }
+
+    return result.updatedSession;
+  } catch (err) {
+    console.error("❌ Error saving task:", err.message);
+    return null;
+  }
+}
+
+
+
+
+async function updateTaskDoneStatus(sessionId, taskText, done) {
+  try {
+    const response = await fetch("/api/toggleTaskStatus", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sessionId,
+        taskText,
+        done,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || "Failed to update task status");
+    }
+
+    return result.updatedSession;
+  } catch (err) {
+    console.error("❌ Error toggling task status:", err.message);
+    return null;
+  }
+}
+
+
+
+
+
+
+
 
   const formatTime = (remainingSeconds) => {
     const minutes = String(Math.floor(remainingSeconds / 60)).padStart(2, '0');
@@ -87,6 +282,40 @@ useEffect(() => {
     return `${minutes}:${seconds}`;
   };
   
+
+    // ⏯ Pause/Resume button logic
+  const togglePlay = () => {
+    const current = latestRemainingTimeRef.current;
+    setIsPlaying((prev) => {
+      const newIsPlaying = !prev;
+      if (current !== null && sessionId) {
+        localStorage.setItem(`session-${sessionId}`, JSON.stringify({
+          timeLeft: current,
+          isPlaying: newIsPlaying
+        }));
+      }
+      return newIsPlaying;
+    });
+  };
+
+
+   const handleReset = () => {
+    setIsPlaying(false);
+    setKey(prev => prev + 1);
+    setTimeLeft(initialTime);
+    latestRemainingTimeRef.current = initialTime;
+
+    if (sessionId) {
+      localStorage.setItem(`session-${sessionId}`, JSON.stringify({
+        timeLeft: initialTime,
+        isPlaying: false
+      }));
+    }
+  };
+
+
+
+
 
 
 
@@ -172,15 +401,31 @@ useEffect(() => {
           value={task.text}
           onChange={(e) => updateTaskText(idx, e.target.value)}
         />
+
+
+
+          {/* Save Button */}
+  {!task.saved && task.text.trim() !== "" && (
+    <button
+      onClick={() => saveTask(idx)}
+      className="ml-2 px-2 py-1 text-xs text-black bg-amber-400 rounded hover:bg-amber-300"
+    >
+      Save
+    </button>
+  )}
       </li>
     ))}
   </ul>
+
+
   <button
     onClick={addTask}
     className="mt-4 text-sm text-amber-300 hover:underline"
   >
     + Add Task
   </button>
+
+  
 </div>
 
 
@@ -207,48 +452,75 @@ useEffect(() => {
 
           {/* Circular Timer */}
           <div className="mb-8">
+
             <CountdownCircleTimer
               isPlaying={isPlaying}
-              duration={parsedTime}
+              //duration={parsedTime}
+              duration={timeLeft}
               key={key}
               colors={['#FACC15', '#F97316', '#EF4444']}
               colorsTime={[parsedTime, parsedTime * 0.5, 0]}
               size={300}
               strokeWidth={16}
               trailColor="#ffffff20"
+
+              // onUpdate={(remaining) => {
+              //  setTimeLeft(remaining); // 🧠 Track latest time left
+              // }}
+
+
               onComplete={() => {
                 setIsPlaying(false);
                 return { shouldRepeat: false };
               }}
+
+
             >
-              {({ remainingTime }) => (
+            
+
+                {({ remainingTime }) => {
+              latestRemainingTimeRef.current = remainingTime;
+              return (
                 <div className="text-4xl font-bold">
                   {formatTime(remainingTime)}
                 </div>
-              )}
+              );
+            }}
             </CountdownCircleTimer>
           </div>
+
+
 
           
 
           {/* Timer Control Buttons */}
-          <div className="mt-10 space-x-4">
-            <button
-              className="px-5 py-2 bg-white text-black rounded-full hover:bg-amber-200 shadow"
-              onClick={() => setIsPlaying((prev) => !prev)}
-            >
-              {isPlaying ? "Pause" : "Resume"}
-            </button>
-            <button
-              className="px-5 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 shadow"
-              onClick={() => {
-                setKey(prev => prev + 1);
-                setIsPlaying(false);
-              }}
-            >
-              Reset
-            </button>
-          </div>
+          
+
+
+
+
+
+           {/* Timer Control Buttons */}
+      <div className="mt-10 space-x-4">
+        <button
+          className="px-5 py-2 bg-white text-black rounded-full hover:bg-amber-200 shadow"
+          onClick={togglePlay}
+        >
+          {isPlaying ? "Pause" : "Resume"}
+        </button>
+
+        <button
+          className="px-5 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 shadow"
+          onClick={handleReset}
+        >
+          Reset
+        </button>
+      </div>
+
+
+
+
+
         </motion.div>
       </main>
     </div>

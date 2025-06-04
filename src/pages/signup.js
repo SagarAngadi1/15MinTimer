@@ -52,6 +52,8 @@ export default function SignUp() { //Exports the SignUp function as the default 
     animate();
   }, []);
 
+
+  
   const handleSubmit = async (e) => { // Declares an asynchronous function named handleSubmit to handle form submission.
     e.preventDefault(); //Prevents the default behavior of the form submission (which is to reload the page).
 
