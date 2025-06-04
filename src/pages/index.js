@@ -580,7 +580,7 @@ export default function Home({ currentUser }) {
   <div className="max-w-5xl mx-auto text-center">
     <h2 className="text-4xl font-extrabold mb-6 text-amber-300">Choose Your Mission Plan</h2>
     <p className="text-lg text-white/80 mb-16">
-      Whether you're just getting started or going all in, we’ve got you covered.
+      Whether you&apos;re just getting started or going all in, we&apos;ve got you covered.
     </p>
 
     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
