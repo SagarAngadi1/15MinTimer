@@ -113,7 +113,19 @@ const toggleTempTaskDone = (index) => {
           const data = await res.json();
     
           if (data.success && data.sessions.length > 0) {
-            setSessions(data.sessions);
+            //setSessions(data.sessions);
+            const normalizedSessions = data.sessions.map(session => ({
+  ...session,
+  tasks: session.tasks.map(t => ({
+    text: typeof t === "string" ? t : t.text,
+    done: typeof t === "object" && typeof t.done === "boolean" ? t.done : false,
+  }))
+}));
+setSessions(normalizedSessions);
+
+
+
+
           } else {
             // Optional: Leave as empty to fall back to default placeholders
             setSessions([]);
@@ -154,6 +166,7 @@ const toggleTempTaskDone = (index) => {
       });
 
       const formData = new FormData();
+      
       formData.append("title", title);
       formData.append("note", note);
       formData.append("time", time);
@@ -175,10 +188,6 @@ const toggleTempTaskDone = (index) => {
          alert(result.message || 'Daily Session limit reached: Please Subscribe to Pro For Unlimited Sessions');
          return;
       }
-
-
-  
-     
 
       // Append each task
       // tasks.forEach((task, index) => {
@@ -430,8 +439,8 @@ const toggleTempTaskDone = (index) => {
               //time={typeof card.time === "number" ? `${card.time}:00` : card.time}
               img={image.img}
               objectPosition={image.objectPosition}
-              //tasks={card.tasks}
-              tasks={card.tasks?.map(task => typeof task === 'string' ? task : task.text)}
+              tasks={card.tasks}
+              //tasks={card.tasks?.map(task => typeof task === 'string' ? task : task.text)}
 
               onClick={() => handleWorkSpaceNavigation(card)}
              // onClick={handleWorkSpaceNavigation}
@@ -439,6 +448,9 @@ const toggleTempTaskDone = (index) => {
           );
         })}
       </div>
+
+
+
 
 
 {showModal && (
@@ -453,7 +465,7 @@ const toggleTempTaskDone = (index) => {
               onClick={() => setShowModal(false)}
               className="absolute top-4 right-4 text-white hover:text-red-400 text-xl font-bold"
             >
-              ×
+            ×
             </button>
 
             <h2 className="text-center text-2xl font-bold mb-6">Create New Session</h2>

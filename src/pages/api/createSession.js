@@ -64,66 +64,64 @@ const handler = async (req, res) =>{
 
 
 
-      // const tasks = [];
-      // for (const key in fields) {
-      //   if (key.startsWith("tasks[")) {
-      //     const value = fields[key];
-      //     if (Array.isArray(value)) {
-      //       tasks.push(...value.map(String)); // Flatten inner array and cast to string
-      //     } else {
-      //       tasks.push(String(value));
-      //     }
-      //   }
-      // }
 
+      // let rawTasks = fields.tasks || [];
+      // if (!Array.isArray(rawTasks)) rawTasks = [rawTasks];
 
-
-
-
-      // const tasks = [];
-
-      // for (const key in fields) {
-      //      if (key.startsWith("tasks[")) {
-      //     const value = fields[key];
-      //     if (Array.isArray(value)) {
-      //     tasks.push(...value.map(val => ({ text: String(val), done: false })));
-      //      } else {
-      //     tasks.push({ text: String(value), done: false });
-      //   }
-      //  }
-      // }
+      // const tasks = rawTasks.map(task => ({
+      //    text: String(task),
+      //    done: false,
+      // }));
 
 
       let rawTasks = fields.tasks || [];
-if (!Array.isArray(rawTasks)) rawTasks = [rawTasks];
+      if (!Array.isArray(rawTasks)) rawTasks = [rawTasks];
 
-const tasks = rawTasks.map(task => ({
-  text: String(task),
-  done: false,
-}));
+     const cleanedTasks = rawTasks
+    .map(task => String(task).trim())
+    .filter(task => task.length > 0)
+    .map(task => ({ text: task, done: false }));
 
 
       
 
 
-      const createdDate = new Date().toISOString();
+    const createdDate = new Date().toISOString();
 
-      const newSession = new Session({
-        //identity: userId,
-        title: sessionTitle,
-        note: sessionNote,
-        //time: Number(time),
+
+
+
+    const newSessionData = {
+       title: sessionTitle,
+         note: sessionNote,
         time: Number(sessionTime),
-        //time: sessionTime,
-        tasks,
         userId: userId,
         createdDate: createdDate,
+    };
 
-      });
+    if (cleanedTasks.length > 0) {
+      newSessionData.tasks = cleanedTasks;
+    }
 
-      await newSession.save();
+    const newSession = new Session(newSessionData);
+    await newSession.save();
 
-      //return res.status(201).json(newSession);
+
+
+
+
+      // const newSession = new Session({
+      //   title: sessionTitle,
+      //   note: sessionNote,
+      //   time: Number(sessionTime),
+      //   tasks,
+      //   userId: userId,
+      //   createdDate: createdDate,
+
+      // });
+      // await newSession.save();
+
+      
 
       return res.status(201).json({
 

@@ -1,146 +1,141 @@
-import React from "react";
-import { motion } from "framer-motion";
-import Head from "next/head";
-import { useEffect, useRef, useState } from "react";
+// import { useScroll, useTransform, motion } from 'framer-motion';
+// import { useRef } from 'react';
 
-export default function Home() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+// export default function HeroSection() {
+//   const ref = useRef(null);
+//   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] });
 
-  useEffect(() => {
-    const updateMousePosition = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
+//   // Transform the scale and Y position of the person
+//   const scale = useTransform(scrollYProgress, [0, 1], [1.2, 0.6]);
+//   const y = useTransform(scrollYProgress, [0, 1], [150, 0]);
+//   const opacity = useTransform(scrollYProgress, [0, 0.2], [0, 1]);
 
-    window.addEventListener("mousemove", updateMousePosition);
-    return () => {
-      window.removeEventListener("mousemove", updateMousePosition);
-    };
-  }, []);
+//   return (
+//     <section ref={ref} className="relative h-[400vh] overflow-hidden">
+//       {/* Background */}
+//       <img
+//         src="background.png"
+//         className="fixed top-0 left-0 w-full h-full object-cover z-0 object-[50%_50%]"
+//         alt="Background Scene"
+//       />
 
-  function generateWavyCirclePath(radius, amplitude, frequency, phase = 0) {
-    const points = [];
-    const resolution = 200; // Higher = smoother
-    for (let i = 0; i <= resolution; i++) {
-      const angle = (i / resolution) * 2 * Math.PI;
-      const wave = amplitude * Math.sin(angle * frequency + phase);
-      const r = radius + wave;
-      const x = 150 + r * Math.cos(angle); // Centered at (150, 150)
-      const y = 150 + r * Math.sin(angle);
-      points.push(`${i === 0 ? "M" : "L"} ${x} ${y}`);
-    }
-    return points.join(" ") + " Z";
-  }
+//       {/* Person */}
+//       <motion.img
+//         src="personback.png"
+//         className="fixed top-1/2 left-1/2 w-48 md:w-72 z-10 -translate-x-1/2 -translate-y-1/2"
+//         style={{ scale, y, opacity }}
+//         alt="Person"
+//       />
 
-  const [paths, setPaths] = useState({
-    wave1: "",
-    wave2: "",
-    wave3: "",
-  });
+//       {/* Scroll-triggered Elements */}
+//       <motion.div
+//         style={{ y: useTransform(scrollYProgress, [0.2, 0.4], [300, 0]), opacity }}
+//         className="absolute top-[120vh] w-full text-center z-20"
+//       >
+//         <h1 className="text-white text-4xl md:text-6xl font-bold">Step into the Portal</h1>
+//         <p className="text-white mt-4 text-lg max-w-xl mx-auto">
+//           Where thoughts and reality blur.
+//         </p>
+//         <button className="mt-6 px-6 py-3 bg-white text-black font-semibold rounded-full hover:bg-opacity-80 transition">
+//           Enter Now
+//         </button>
+//       </motion.div>
+//     </section>
+//   );
+// }
 
-  const phase = useRef(0);
 
-  useEffect(() => {
-    const animate = () => {
-      phase.current += 0.03;
 
-      setPaths({
-        wave1: generateWavyCirclePath(100, 8, 6, phase.current),
-        wave2: generateWavyCirclePath(90, 6, 5, phase.current + 1),
-        wave3: generateWavyCirclePath(110, 7, 7, phase.current + 2),
-      });
 
-      requestAnimationFrame(animate);
-    };
 
-    animate();
-  }, []);
+
+
+
+
+
+
+
+import { useScroll, useTransform, motion } from 'framer-motion';
+import { useRef } from 'react';
+
+export default function HeroSection() {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] });
+
+  // Person animation: scale down + move up as if walking into ocean
+  const scale = useTransform(scrollYProgress, [0, 1], [1.2, 0.6]);
+  const y = useTransform(scrollYProgress, [0, 1], [150, 0]);
+  const opacity = useTransform(scrollYProgress, [0, 0.2], [0, 1]);
+
+  // Text milestone transforms
+  const milestone1Scale = useTransform(scrollYProgress, [0.1, 0.2], [0.6, 1.2]);
+  const milestone1Y = useTransform(scrollYProgress, [0.1, 0.2], [0, 0]);
+  const milestone1Opacity = useTransform(scrollYProgress, [0.1, 0.15], [0, 1]);
+
+  const milestone2Scale = useTransform(scrollYProgress, [0.25, 0.35], [0.4, 1]);
+  const milestone2Y = useTransform(scrollYProgress, [0.25, 0.35], [600, 0]);
+  const milestone2Opacity = useTransform(scrollYProgress, [0.25, 0.3], [0, 1]);
+
+  const milestone3Scale = useTransform(scrollYProgress, [0.4, 0.5], [0.4, 1]);
+  const milestone3Y = useTransform(scrollYProgress, [0.4, 0.5], [600, 0]);
+  const milestone3Opacity = useTransform(scrollYProgress, [0.4, 0.45], [0, 1]);
+
+  const milestone4Scale = useTransform(scrollYProgress, [0.55, 0.65], [0.4, 1]);
+  const milestone4Y = useTransform(scrollYProgress, [0.55, 0.65], [600, 0]);
+  const milestone4Opacity = useTransform(scrollYProgress, [0.55, 0.6], [0, 1]);
 
   return (
-    <div className="min-h-screen bg-black text-white font-sans">
-      <Head>
-        <title>15-Min Timer</title>
-        <meta
-          name="description"
-          content="Unlock your focus with a powerful 15-minute timer philosophy."
-        />
-      </Head>
-
-      {/* Cursor glow */}
-      <div
-        className="pointer-events-none fixed z-50 rounded-full blur-3xl mix-blend-screen"
-        style={{
-          top: mousePosition.y - 150,
-          left: mousePosition.x - 150,
-          width: 300,
-          height: 300,
-          background:
-            "radial-gradient(circle, rgba(168,85,247,0.6), rgba(168,85,247,0.1), transparent 80%)",
-        }}
+    <section ref={ref} className="relative h-[500vh] overflow-hidden">
+      {/* Background */}
+      <img
+        src="background.png"
+        className="fixed top-0 left-0 w-full h-full object-cover z-0 object-[50%_50%]"
+        alt="Background Scene"
       />
 
-      {/* Hero Section */}
-      <section className="relative flex flex-col items-center justify-center text-center px-6 py-32 overflow-hidden">
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <div className="w-full h-full bg-gradient-to-br from-purple-900 via-black to-gray-900 opacity-30 animate-pulse"></div>
-        </div>
+      {/* Person */}
+      <motion.img
+        src="personback.png"
+        className="fixed top-1/2 left-1/2 w-48 md:w-72 z-10 -translate-x-1/2 -translate-y-1/2"
+        style={{ scale, y, opacity }}
+        alt="Person"
+      />
 
-        <motion.h1
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-          className="text-5xl md:text-6xl font-extrabold z-10"
-        >
-          The 15-Minute Focus Revolution
-        </motion.h1>
+      {/* Milestone 1 - Right */}
+      <motion.div
+        className="fixed top-1/2 left-[70%] transform -translate-y-1/2 text-white z-20 text-right w-[300px]"
+        style={{ scale: milestone1Scale, y: milestone1Y, opacity: milestone1Opacity }}
+      >
+        <h2 className="text-2xl md:text-4xl font-bold">The Beginning</h2>
+        <p className="mt-2 text-sm md:text-base">It starts with a single step into the unknown.</p>
+      </motion.div>
 
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 1 }}
-          className="mt-6 text-xl md:text-2xl max-w-3xl text-gray-300 z-10"
-        >
-          Science meets simplicity. Boost your productivity, creativity, and
-          discipline—15 minutes at a time.
-        </motion.p>
+      {/* Milestone 2 - Left */}
+      <motion.div
+        className="fixed top-1/2 left-[10%] transform -translate-y-1/2 text-white z-20 text-left w-[300px]"
+        style={{ scale: milestone2Scale, y: milestone2Y, opacity: milestone2Opacity }}
+      >
+        <h2 className="text-2xl md:text-4xl font-bold">The Realization</h2>
+        <p className="mt-2 text-sm md:text-base">Where your thoughts begin to shape the world.</p>
+      </motion.div>
 
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 1.2, duration: 1 }}
-          className="relative w-64 h-64 mt-8 flex items-center justify-center"
-        >
-          <svg
-            viewBox="0 0 300 300"
-            className="absolute top-0 left-0 w-full h-full"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d={paths.wave1}
-              fill="none"
-              stroke="#a855f7" // purple-500
-              strokeWidth="2"
-              className="wave-path"
-            />
-            <path
-              d={paths.wave2}
-              fill="none"
-              stroke="#22d3ee" // cyan-400
-              strokeWidth="1.5"
-              className="wave-path"
-            />
-            <path
-              d={paths.wave3}
-              fill="none"
-              stroke="#f472b6" // pink-400
-              strokeWidth="1.5"
-              className="wave-path"
-            />
-          </svg>
+      {/* Milestone 3 - Right */}
+      <motion.div
+        className="fixed top-1/2 left-[70%] transform -translate-y-1/2 text-white z-20 text-right w-[300px]"
+        style={{ scale: milestone3Scale, y: milestone3Y, opacity: milestone3Opacity }}
+      >
+        <h2 className="text-2xl md:text-4xl font-bold">The Shift</h2>
+        <p className="mt-2 text-sm md:text-base">You are no longer just a visitor—you become a part of it.</p>
+      </motion.div>
 
-          {/* Timer Text */}
-          <div className="text-4xl text-white font-bold z-10">15:00</div>
-        </motion.div>
-      </section>
-    </div>
+      {/* Milestone 4 - Left */}
+      <motion.div
+        className="fixed top-1/2 left-[10%] transform -translate-y-1/2 text-white z-20 text-left w-[300px]"
+        style={{ scale: milestone4Scale, y: milestone4Y, opacity: milestone4Opacity }}
+      >
+        <h2 className="text-2xl md:text-4xl font-bold">The Merge</h2>
+        <p className="mt-2 text-sm md:text-base">Reality and imagination blur into one seamless flow.</p>
+      </motion.div>
+    </section>
   );
 }

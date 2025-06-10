@@ -1,44 +1,3 @@
-// import { motion } from "framer-motion";
-// import { FaStopwatch } from "react-icons/fa";
-
-// export default function TimerCard({ title, time, checklist = [] }) {
-//   return (
-//     <motion.div
-//       whileHover={{ scale: 1.02 }}
-//       className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-5 shadow-md shadow-purple-500/10 flex flex-col gap-3"
-//     >
-//       <div className="flex items-center justify-between">
-//         <h3 className="text-lg text-white font-semibold">{title}</h3>
-//         <motion.div
-//           animate={{ rotate: [0, 360] }}
-//           transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
-//         >
-//           <FaStopwatch className="text-cyan-400 text-xl" />
-//         </motion.div>
-//       </div>
-
-//       <ul className="text-sm text-white/70 list-disc list-inside space-y-1">
-//         {checklist.map((item, idx) => (
-//           <li key={idx}>{item}</li>
-//         ))}
-//       </ul>
-
-//       <div className="text-right text-xs text-white/50 italic">{time}</div>
-//     </motion.div>
-//   );
-// }
-
-
-
-
-
-
-
-
-
-
-
-
 import { motion } from "framer-motion";
 import { FaStopwatch } from "react-icons/fa";
 
@@ -81,9 +40,51 @@ export default function TimerCard({ title, time, tasks = [], img, objectPosition
           type="checkbox"
           className="peer hidden"
         />
-        <div className="w-4 h-4 rounded-md border border-gray-400 peer-checked:bg-amber-200 flex items-center justify-center transition">
-          {/* Checkmark (✓) inside the box */}
-          <svg
+        <div 
+        //className="w-4 h-4 rounded-md border border-gray-400 peer-checked:bg-amber-200 flex items-center justify-center transition">
+          
+
+          className={`w-4 h-4 rounded-md border border-gray-400 peer-checked:bg-amber-200 flex items-center justify-center transition
+            ${
+              task.done
+                ? "bg-amber-400 border-amber-400"
+                : "border-white/30 hover:border-amber-300"
+            }`
+          }
+        >  
+        
+        
+        {/* className={`w-5 h-5 min-w-[20px] min-h-[20px] border-2 rounded-md flex items-center justify-center cursor-pointer transition-all duration-200
+            ${
+              task.done
+                ? "bg-amber-400 border-amber-400"
+                : "border-white/30 hover:border-amber-300"
+            }`
+          }
+        >   */}
+
+
+
+
+
+        {/* Checkmark (✓) inside the box */}
+
+
+         {task.done && (
+            <svg
+              className="w-3 h-3 text-black"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              viewBox="0 0 24 24"
+            >
+              <path d="M5 13l4 4L19 7" />
+            </svg>
+          )}
+
+
+
+          {/* <svg
             className="w-3 h-3 text-black opacity-0 peer-checked:opacity-100 transition"
             fill="none"
             stroke="currentColor"
@@ -91,9 +92,9 @@ export default function TimerCard({ title, time, tasks = [], img, objectPosition
             viewBox="0 0 24 24"
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-          </svg>
+          </svg> */}
         </div>
-        <span className="select-none">{task}</span>
+        <span className="select-none">{task.text}</span>
       </label>
     </li>
   ))}

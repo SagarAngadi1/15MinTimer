@@ -99,26 +99,23 @@ useEffect(() => {
   setNoteText(note || "");
 }, [note]);
 
- // Editable Tasks State
-//  const [editableTasks, setEditableTasks] = useState(() => {
-//     try {
-//       const parsed = JSON.parse(rawTasks || "[]");
-//       return Array.isArray(parsed)
-//         ? parsed.map(t => ({ text: t, done: false }))
-//         : typeof parsed === "string"
-//         ? [{ text: parsed, done: false }]
-//         : [];
-//     } catch {
-//       return [];
-//     }
-//   });
 
 
-  const [editableTasks, setEditableTasks] = useState(() => {
+
+
+
+
+
+
+const [editableTasks, setEditableTasks] = useState(() => {
   try {
     const parsed = JSON.parse(rawTasks || "[]");
     return Array.isArray(parsed)
-      ? parsed.map(t => ({ text: t, done: false, saved: true }))
+      ? parsed.map(t => ({
+          text: t.text || t,
+          done: typeof t.done === "boolean" ? t.done : false,
+          saved: true,
+        }))
       : typeof parsed === "string"
       ? [{ text: parsed, done: false, saved: true }]
       : [];
@@ -130,20 +127,77 @@ useEffect(() => {
 
 
 
-  // ✅ This useEffect ensures task state updates on router refresh or query change
   useEffect(() => {
+  async function fetchSessionData() {
+    if (!sessionId) return;
+
     try {
-      const newTasks = JSON.parse(router.query.tasks || "[]");
-      const formattedTasks = Array.isArray(newTasks)
-        ? newTasks.map(t => ({ text: t, done: false }))
-        : typeof newTasks === "string"
-        ? [{ text: newTasks, done: false }]
-        : [];
-      setEditableTasks(formattedTasks);
-    } catch {
-      setEditableTasks([]);
+      const res = await fetch('/api/getSessionById', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ sessionId }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        const session = data.session;
+        setSession(session);
+
+        // ✅ Update editableTasks from DB
+        const dbTasks = session.tasks.map(t => ({
+          text: t.text,
+          done: t.done,
+          saved: true,
+        }));
+        setEditableTasks(dbTasks);
+      }
+    } catch (err) {
+      console.error("❌ Error fetching session data:", err.message);
     }
-  }, [router.query.tasks]);
+  }
+
+  fetchSessionData();
+}, [sessionId]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  //REMOVE THIS AND CHECK
+//   useEffect(() => {
+//   try {
+//     const newTasks = JSON.parse(router.query.tasks || "[]");
+//     const formattedTasks = Array.isArray(newTasks)
+//       ? newTasks.map(t => ({
+//           text: t.text || t,
+//           done: typeof t.done === "boolean" ? t.done : false,
+//           saved: true,
+//         }))
+//       : typeof newTasks === "string"
+//       ? [{ text: newTasks, done: false, saved: true }]
+//       : [];
+//     setEditableTasks(formattedTasks);
+//   } catch {
+//     setEditableTasks([]);
+//   }
+// }, [router.query.tasks]);
+
 
 
 
@@ -404,8 +458,9 @@ async function updateTaskDoneStatus(sessionId, taskText, done) {
 
 
 
-          {/* Save Button */}
-  {!task.saved && task.text.trim() !== "" && (
+      {/* Save Button */}
+  {!task.saved && task.text.trim() !== "" &&
+   (
     <button
       onClick={() => saveTask(idx)}
       className="ml-2 px-2 py-1 text-xs text-black bg-amber-400 rounded hover:bg-amber-300"

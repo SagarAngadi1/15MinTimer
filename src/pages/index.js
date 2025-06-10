@@ -96,7 +96,7 @@ export default function Home({ currentUser }) {
 
   const handlePlayGroundNavigation = () => {
     router.push('/PlayGround');
-    //router.push('/test');
+    //router.push('/newtest');
 
   };
 
@@ -300,6 +300,8 @@ export default function Home({ currentUser }) {
     Missions
   </a>
 
+
+
   {user ? null : (
     <>
       {/* Show only if user not logged in */}
@@ -323,7 +325,7 @@ export default function Home({ currentUser }) {
 
   {/* Start - Always visible */}
   <Link
-    href="/PlayGround"
+    href="/newtest"
     className="text-base text-white/80 hover:text-amber-300 transition-all duration-200"
   >
     Start
@@ -410,7 +412,7 @@ export default function Home({ currentUser }) {
               transition={{ delay: 2.4, duration: 1 }}
               className="text-2xl sm:text-2xl md:text-6xl font-extrabold"
             >
-              The 15-Minute Revolution
+              The Flow State Revolution
             </motion.h1>
 
             <motion.p

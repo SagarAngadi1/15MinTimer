@@ -20,7 +20,7 @@
 import mongoose from "mongoose";
 
 const TaskSchema = new mongoose.Schema({
-  text: { type: String, required: true },
+  text: { type: String, default: '' },
   done: { type: Boolean, default: false },
 }, { _id: false }); // _id false = don’t generate sub-ids for each task
 
