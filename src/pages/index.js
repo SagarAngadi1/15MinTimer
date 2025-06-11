@@ -325,7 +325,7 @@ export default function Home({ currentUser }) {
 
   {/* Start - Always visible */}
   <Link
-    href="/newtest"
+    href="/PlayGround"
     className="text-base text-white/80 hover:text-amber-300 transition-all duration-200"
   >
     Start
